@@ -1,0 +1,21 @@
+# Utiliza la imagen base de Ubuntu 20.10
+FROM ubuntu:20.10
+
+# Actualiza el índice de paquetes e instala SSH
+RUN apt-get update && \
+    apt-get install -y openssh-server && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Configura el servicio SSH para permitir la conexión en el puerto 22
+RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config
+
+# Establece la contraseña para el usuario root (cambia 'tu_contraseña' por la contraseña que deseas)
+RUN echo 'root:tu_contraseña' | chpasswd
+
+# Expon el puerto 22
+EXPOSE 22
+
+# Inicia el servicio SSH al arrancar el contenedor
+CMD ["/usr/sbin/sshd", "-D"]
